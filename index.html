@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>饮料生产企业线性规划优化系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card h2 {
+            color: #2E8B57;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            border-bottom: 3px solid #2E8B57;
+            padding-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2E8B57, #228B22);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(46, 139, 87, 0.3);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .results-table th {
+            background: #2E8B57;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .results-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            margin: 2rem 0;
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .download-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #2E8B57, #228B22);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46, 139, 87, 0.4);
+        }
+
+        .download-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .constraint-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .constraint-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border-left: 5px solid #2E8B57;
+        }
+
+        .constraint-card h4 {
+            color: #2E8B57;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.high { background: linear-gradient(90deg, #dc3545, #c82333); }
+        .progress-fill.medium { background: linear-gradient(90deg, #ffc107, #e0a800); }
+        .progress-fill.low { background: linear-gradient(90deg, #28a745, #218838); }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: white;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-glass-cheers"></i> 饮料生产企业线性规划优化系统</h1>
+            <p>运筹学专家系统 - 解决原料和运输双重约束下的利润最大化问题</p>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-chart-line"></i> 优化结果概览</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-coins"></i>
+                    <h3>85,540</h3>
+                    <p>最大利润 (元)</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-industry"></i>
+                    <h3>8,520</h3>
+                    <p>总产量 (升)</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-sync-alt"></i>
+                    <h3>2</h3>
+                    <p>求解迭代次数</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>最优解</h3>
+                    <p>求解状态</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-clipboard-list"></i> 最优生产方案</h2>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>饮料类型</th>
+                        <th>生产量 (升)</th>
+                        <th>占比 (%)</th>
+                        <th>单位利润 (元/升)</th>
+                        <th>利润贡献 (元)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="fas fa-wine-bottle"></i> 碳酸饮料</td>
+                        <td>1,600</td>
+                        <td>18.8%</td>
+                        <td>8.5</td>
+                        <td>13,600</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-apple-alt"></i> 果汁饮料</td>
+                        <td>1,920</td>
+                        <td>22.5%</td>
+                        <td>12.0</td>
+                        <td>23,040</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-leaf"></i> 茶饮料</td>
+                        <td>1,800</td>
+                        <td>21.1%</td>
+                        <td>10.5</td>
+                        <td>18,900</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-bolt"></i> 功能饮料</td>
+                        <td>1,200</td>
+                        <td>14.1%</td>
+                        <td>15.0</td>
+                        <td>18,000</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-tint"></i> 矿泉水</td>
+                        <td>2,000</td>
+                        <td>23.5%</td>
+                        <td>6.0</td>
+                        <td>12,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-chart-pie"></i> 生产方案可视化</h2>
+            <div class="chart-container">
+                <div id="productionChart" style="height: 400px;"></div>
+            </div>
+            <div class="chart-container">
+                <div id="profitChart" style="height: 400px;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-exclamation-triangle"></i> 约束条件分析</h2>
+            <div class="constraint-analysis">
+                <div class="constraint-card">
+                    <h4><i class="fas fa-boxes"></i> 原料约束</h4>
+                    <div>
+                        <strong>白砂糖:</strong> 662/15,000 千克 (4.4%)
+                        <div class="progress-bar">
+                            <div class="progress-fill low" style="width: 4.4%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>浓缩果汁:</strong> 646/8,000 千克 (8.1%)
+                        <div class="progress-bar">
+                            <div class="progress-fill low" style="width: 8.1%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>茶叶提取物:</strong> 530/6,000 千克 (8.8%)
+                        <div class="progress-bar">
+                            <div class="progress-fill low" style="width: 8.8%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>功能成分:</strong> 180/2,000 千克 (9.0%)
+                        <div class="progress-bar">
+                            <div class="progress-fill low" style="width: 9.0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>包装材料:</strong> 916/12,000 千克 (7.6%)
+                        <div class="progress-bar">
+                            <div class="progress-fill low" style="width: 7.6%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="constraint-card">
+                    <h4><i class="fas fa-truck"></i> 运输约束</h4>
+                    <div>
+                        <strong>华北区:</strong> 2,044/3,000 升 (68.1%)
+                        <div class="progress-bar">
+                            <div class="progress-fill medium" style="width: 68.1%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>华东区:</strong> 2,462/2,500 升 (98.5%)
+                        <div class="progress-bar">
+                            <div class="progress-fill high" style="width: 98.5%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>华南区:</strong> 2,000/2,000 升 (100.0%)
+                        <div class="progress-bar">
+                            <div class="progress-fill high" style="width: 100.0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>西南区:</strong> 1,408/1,800 升 (78.2%)
+                        <div class="progress-bar">
+                            <div class="progress-fill medium" style="width: 78.2%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>西北区:</strong> 606/1,200 升 (50.5%)
+                        <div class="progress-bar">
+                            <div class="progress-fill low" style="width: 50.5%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-lightbulb"></i> 管理建议</h2>
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #ffc107;">
+                <h4 style="color: #856404; margin-bottom: 1rem;">⚠️ 关键发现</h4>
+                <ul style="color: #856404; line-height: 1.8;">
+                    <li><strong>华南区运输能力已达上限</strong>：建议增加该区域的运输能力或优化配送策略</li>
+                    <li><strong>华东区运输能力接近饱和</strong>：利用率98.5%，需要密切关注</li>
+                    <li><strong>原料供应充足</strong>：所有原料利用率均低于10%，供应链状况良好</li>
+                    <li><strong>功能饮料利润最高</strong>：单位利润15元/升，建议加大市场推广力度</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-cogs"></i> 模型解释</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div>
+                    <h4 style="color: #2E8B57; margin-bottom: 1rem;">🎯 决策变量</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>x₁: 碳酸饮料生产量 (升)</li>
+                        <li>x₂: 果汁饮料生产量 (升)</li>
+                        <li>x₃: 茶饮料生产量 (升)</li>
+                        <li>x₄: 功能饮料生产量 (升)</li>
+                        <li>x₅: 矿泉水生产量 (升)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #2E8B57; margin-bottom: 1rem;">🔗 约束条件</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>原料供应限制 (5种原料)</li>
+                        <li>运输能力限制 (5个区域)</li>
+                        <li>生产量上下限约束</li>
+                        <li>非负约束条件</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #e8f5e8, #d4edda); border-radius: 10px;">
+                <h4 style="color: #155724; margin-bottom: 1rem;">⚡ 求解算法</h4>
+                <p style="color: #155724; line-height: 1.6;">
+                    系统采用改进的单纯形法（HiGHS求解器），具有多项式时间复杂度，能够高效处理大规模线性规划问题。
+                    通过迭代优化找到满足所有约束条件下的最大利润生产方案。
+                </p>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <h3 style="color: white; margin-bottom: 1rem;">📥 下载资源</h3>
+            <a href="beverage_optimization_model.py" class="download-btn" download>
+                <i class="fas fa-download"></i> 模型源代码
+            </a>
+            <a href="streamlit_app.py" class="download-btn" download>
+                <i class="fas fa-download"></i> 应用界面代码
+            </a>
+            <a href="README.md" class="download-btn" download>
+                <i class="fas fa-download"></i> 项目文档
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 饮料生产企业线性规划优化系统 | 运筹学专家系统</p>
+            <p>基于单纯形法和灵敏度分析的企业决策支持工具</p>
+        </div>
+    </div>
+
+    <script>
+        // 生产量柱状图
+        const productionData = [{
+            x: ['碳酸饮料', '果汁饮料', '茶饮料', '功能饮料', '矿泉水'],
+            y: [1600, 1920, 1800, 1200, 2000],
+            type: 'bar',
+            marker: {
+                color: ['#2E8B57', '#4682B4', '#DAA520', '#CD853F', '#708090']
+            },
+            text: ['1600', '1920', '1800', '1200', '2000'],
+            textposition: 'auto',
+        }];
+
+        const productionLayout = {
+            title: {
+                text: '各饮料最优生产量',
+                font: { size: 18, color: '#2E8B57' }
+            },
+            xaxis: { title: '饮料类型' },
+            yaxis: { title: '生产量 (升)' },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Inter, sans-serif' }
+        };
+
+        Plotly.newPlot('productionChart', productionData, productionLayout, {responsive: true});
+
+        // 利润贡献饼图
+        const profitData = [{
+            labels: ['碳酸饮料', '果汁饮料', '茶饮料', '功能饮料', '矿泉水'],
+            values: [13600, 23040, 18900, 18000, 12000],
+            type: 'pie',
+            hole: 0.4,
+            marker: {
+                colors: ['#2E8B57', '#4682B4', '#DAA520', '#CD853F', '#708090']
+            }
+        }];
+
+        const profitLayout = {
+            title: {
+                text: '各饮料利润贡献分布',
+                font: { size: 18, color: '#2E8B57' }
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Inter, sans-serif' }
+        };
+
+        Plotly.newPlot('profitChart', profitData, profitLayout, {responsive: true});
+    </script>
+</body>
+</html>
