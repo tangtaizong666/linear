@@ -13,6 +13,164 @@ import json
 from datetime import datetime
 import os
 
+SIMPLEX_TABLEAU_HTML = """
+<div style="margin-top:0.5rem;">
+<figure style="margin:1rem auto;max-width:720px;text-align:center;">
+<svg width="720" height="240" viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="st-simplex-iter0">
+  <title id="st-simplex-iter0">单纯形法迭代 0 - 初始单纯形表</title>
+  <style>
+    .title { font: 600 18px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; }
+    .subtitle { font: 500 14px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+    .header-cell { fill:#2563eb; stroke:#1d4ed8; }
+    .header-text { font: 600 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#ffffff; text-anchor:middle; dominant-baseline:middle; }
+    .data-cell { fill:#ffffff; stroke:#cbd5f5; }
+    .pivot-cell { fill:#fde68a; stroke:#f59e0b; }
+    .cell-text { font: 500 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; text-anchor:middle; dominant-baseline:middle; }
+    .note { font: 500 12px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+  </style>
+  <rect x="0" y="0" width="720" height="240" rx="18" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="30" y="35" class="title">迭代 0 · 初始单纯形表</text>
+  <text x="520" y="35" class="subtitle">入基: x₁ | 出基: s₁</text>
+  <rect x="20" y="70" width="130" height="34" class="header-cell"/>
+  <text x="85" y="87" class="header-text">基变量</text>
+  <rect x="150" y="70" width="90" height="34" class="header-cell"/>
+  <text x="195" y="87" class="header-text">x₁</text>
+  <rect x="240" y="70" width="90" height="34" class="header-cell"/>
+  <text x="285" y="87" class="header-text">x₂</text>
+  <rect x="330" y="70" width="90" height="34" class="header-cell"/>
+  <text x="375" y="87" class="header-text">x₃</text>
+  <rect x="420" y="70" width="90" height="34" class="header-cell"/>
+  <text x="465" y="87" class="header-text">s₁</text>
+  <rect x="510" y="70" width="90" height="34" class="header-cell"/>
+  <text x="555" y="87" class="header-text">s₂</text>
+  <rect x="600" y="70" width="100" height="34" class="header-cell"/>
+  <text x="650" y="87" class="header-text">RHS</text>
+  <rect x="20" y="110" width="130" height="32" class="data-cell"/>
+  <text x="85" y="126" class="cell-text">s₁</text>
+  <rect x="150" y="110" width="90" height="32" class="pivot-cell"/>
+  <text x="195" y="126" class="cell-text">2</text>
+  <rect x="240" y="110" width="90" height="32" class="data-cell"/>
+  <text x="285" y="126" class="cell-text">1</text>
+  <rect x="330" y="110" width="90" height="32" class="data-cell"/>
+  <text x="375" y="126" class="cell-text">0</text>
+  <rect x="420" y="110" width="90" height="32" class="data-cell"/>
+  <text x="465" y="126" class="cell-text">1</text>
+  <rect x="510" y="110" width="90" height="32" class="data-cell"/>
+  <text x="555" y="126" class="cell-text">0</text>
+  <rect x="600" y="110" width="100" height="32" class="data-cell"/>
+  <text x="650" y="126" class="cell-text">240</text>
+  <rect x="20" y="146" width="130" height="32" class="data-cell"/>
+  <text x="85" y="162" class="cell-text">s₂</text>
+  <rect x="150" y="146" width="90" height="32" class='data-cell'/>
+  <text x="195" y="162" class='cell-text'>1</text>
+  <rect x="240" y="146" width="90" height="32" class="data-cell"/>
+  <text x="285" y="162" class="cell-text">3</text>
+  <rect x="330" y="146" width="90" height="32" class="data-cell"/>
+  <text x="375" y="162" class="cell-text">1</text>
+  <rect x="420" y="146" width="90" height="32" class="data-cell"/>
+  <text x="465" y="162" class="cell-text">0</text>
+  <rect x="510" y="146" width="90" height="32" class="data-cell"/>
+  <text x="555" y="162" class="cell-text">1</text>
+  <rect x="600" y="146" width="100" height="32" class="data-cell"/>
+  <text x="650" y="162" class="cell-text">360</text>
+  <rect x="20" y="182" width="130" height="32" class="data-cell"/>
+  <text x="85" y="198" class="cell-text">Z</text>
+  <rect x="150" y="182" width="90" height="32" class="data-cell"/>
+  <text x="195" y="198" class="cell-text">-5</text>
+  <rect x="240" y="182" width="90" height="32" class="data-cell"/>
+  <text x="285" y="198" class="cell-text">-4</text>
+  <rect x="330" y="182" width="90" height="32" class="data-cell"/>
+  <text x="375" y="198" class="cell-text">-3</text>
+  <rect x="420" y="182" width="90" height="32" class="data-cell"/>
+  <text x="465" y="198" class="cell-text">0</text>
+  <rect x="510" y="182" width="90" height="32" class="data-cell"/>
+  <text x="555" y="198" class="cell-text">0</text>
+  <rect x="600" y="182" width="100" height="32" class="data-cell"/>
+  <text x="650" y="198" class="cell-text">0</text>
+  <text x="30" y="222" class="note">最小比值检验：s₁ 行 240 ÷ 2 = 120，s₂ 行 360 ÷ 1 = 360 → 选 s₁ 离基</text>
+</svg>
+<figcaption style="font-size:0.9rem;color:#475569;">初始基为 s₁、s₂，x₁ 列的 reduced cost 最负，通过最小比值选择 s₁ 离基。</figcaption>
+</figure>
+
+<figure style="margin:1.5rem auto;max-width:720px;text-align:center;">
+<svg width="720" height="240" viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="st-simplex-iter1">
+  <title id="st-simplex-iter1">单纯形法迭代 1 - 枢轴完成后</title>
+  <style>
+    .title { font: 600 18px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; }
+    .subtitle { font: 500 14px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+    .header-cell { fill:#2563eb; stroke:#1d4ed8; }
+    .header-text { font: 600 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#ffffff; text-anchor:middle; dominant-baseline:middle; }
+    .data-cell { fill:#ffffff; stroke:#cbd5f5; }
+    .pivot-cell { fill:#fde68a; stroke:#f59e0b; }
+    .cell-text { font: 500 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; text-anchor:middle; dominant-baseline:middle; }
+    .note { font: 500 12px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+  </style>
+  <rect x="0" y="0" width="720" height="240" rx="18" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="30" y="35" class="title">迭代 1 · 枢轴完成后</text>
+  <text x="520" y="35" class="subtitle">入基: x₂ | 出基: s₂</text>
+  <rect x="20" y="70" width="130" height="34" class="header-cell"/>
+  <text x="85" y="87" class="header-text">基变量</text>
+  <rect x="150" y="70" width="90" height="34" class="header-cell"/>
+  <text x="195" y="87" class="header-text">x₁</text>
+  <rect x="240" y="70" width="90" height="34" class="header-cell"/>
+  <text x="285" y="87" class="header-text">x₂</text>
+  <rect x="330" y="70" width="90" height="34" class="header-cell"/>
+  <text x="375" y="87" class="header-text">x₃</text>
+  <rect x="420" y="70" width="90" height="34" class="header-cell"/>
+  <text x="465" y="87" class="header-text">s₁</text>
+  <rect x="510" y="70" width="90" height="34" class="header-cell"/>
+  <text x="555" y="87" class="header-text">s₂</text>
+  <rect x="600" y="70" width="100" height="34" class="header-cell"/>
+  <text x="650" y="87" class="header-text">RHS</text>
+  <rect x="20" y="110" width="130" height="32" class="data-cell"/>
+  <text x="85" y="126" class="cell-text">x₁</text>
+  <rect x="150" y="110" width="90" height="32" class="data-cell"/>
+  <text x="195" y="126" class="cell-text">1</text>
+  <rect x="240" y="110" width="90" height="32" class="data-cell"/>
+  <text x="285" y="126" class="cell-text">0.5</text>
+  <rect x="330" y="110" width="90" height="32" class="data-cell"/>
+  <text x="375" y="126" class="cell-text">0</text>
+  <rect x="420" y="110" width="90" height="32" class="data-cell"/>
+  <text x="465" y="126" class="cell-text">0.5</text>
+  <rect x="510" y="110" width="90" height="32" class="data-cell"/>
+  <text x="555" y="126" class="cell-text">0</text>
+  <rect x="600" y="110" width="100" height="32" class="data-cell"/>
+  <text x="650" y="126" class="cell-text">120</text>
+  <rect x="20" y="146" width="130" height="32" class="data-cell"/>
+  <text x="85" y="162" class="cell-text">s₂</text>
+  <rect x="150" y="146" width="90" height="32" class="data-cell"/>
+  <text x="195" y="162" class="cell-text">0</text>
+  <rect x="240" y="146" width="90" height="32" class="pivot-cell"/>
+  <text x="285" y="162" class="cell-text">2.5</text>
+  <rect x="330" y="146" width="90" height="32" class="data-cell"/>
+  <text x="375" y="162" class="cell-text">1</text>
+  <rect x="420" y="146" width="90" height="32" class="data-cell"/>
+  <text x="465" y="162" class="cell-text">-0.5</text>
+  <rect x="510" y="146" width="90" height="32" class="data-cell"/>
+  <text x="555" y="162" class="cell-text">1</text>
+  <rect x="600" y="146" width="100" height="32" class="data-cell"/>
+  <text x="650" y="162" class="cell-text">240</text>
+  <rect x="20" y="182" width="130" height="32" class="data-cell"/>
+  <text x="85" y="198" class="cell-text">Z</text>
+  <rect x="150" y="182" width="90" height="32" class="data-cell"/>
+  <text x="195" y="198" class="cell-text">0</text>
+  <rect x="240" y="182" width="90" height="32" class="data-cell"/>
+  <text x="285" y="198" class="cell-text">-1.5</text>
+  <rect x="330" y="182" width="90" height="32" class="data-cell"/>
+  <text x="375" y="198" class="cell-text">-3</text>
+  <rect x="420" y="182" width="90" height="32" class="data-cell"/>
+  <text x="465" y="198" class="cell-text">2.5</text>
+  <rect x="510" y="182" width="90" height="32" class="data-cell"/>
+  <text x="555" y="198" class="cell-text">0</text>
+  <rect x="600" y="182" width="100" height="32" class="data-cell"/>
+  <text x="650" y="198" class="cell-text">600</text>
+  <text x="30" y="222" class="note">下一步 pivot 在 x₂ 列：s₂ 行 240 ÷ 2.5 = 96 &lt; 120 ÷ 0.5 → 选择 s₂ 离基</text>
+</svg>
+<figcaption style="font-size:0.9rem;color:#475569;">完成第一个枢轴后，第二轮由 x₂ 入基，图中高亮提示下一次换基。</figcaption>
+</figure>
+</div>
+"""
+
 # 导入模型类
 from beverage_optimization_model import BeverageOptimizationModel, model
 
@@ -171,7 +329,7 @@ def sidebar_parameters():
         )
     
     # 更新模型参数
-    if st.sidebar.button("🔄 更新参数并求解", key="update_params"):
+    if st.sidebar.button("🔄 更新参数", key="update_params"):
         params = {
             'profits': profits,
             'material_limits': material_limits,
@@ -369,6 +527,14 @@ def display_solution_results(solution):
     # 4. 约束条件分析
     display_constraint_analysis(solution['constraint_analysis'])
 
+    # 5. 单纯形迭代详细过程
+    simplex_payload = solution.get('simplex_iterations')
+    if simplex_payload and simplex_payload.get('iterations'):
+        with st.expander("🔁 展开查看单纯形法迭代表", expanded=False):
+            display_simplex_iteration_history(simplex_payload)
+
+    # 5. 单纯形迭代详细过程（折叠展示）
+
 def display_constraint_analysis(constraint_analysis):
     """显示约束条件分析"""
     st.markdown("### 🔗 约束条件分析")
@@ -547,6 +713,10 @@ def display_sensitivity_analysis(sensitivity):
     else:
         st.success("✅ 当前生产方案已达到最优，建议保持现有策略")
 
+    # 4. 过程记录
+    display_sensitivity_step_logs(sensitivity)
+
+
 def display_model_explanation():
     """显示模型解释"""
     st.markdown('<div class="section-header">📚 模型解释与算法说明</div>', unsafe_allow_html=True)
@@ -619,6 +789,106 @@ def display_model_explanation():
        - 识别关键约束因素
        - 制定改进策略
     """)
+
+    with st.expander("🔍 查看单纯形法单纯形表迭代", expanded=False):
+        st.markdown(SIMPLEX_TABLEAU_HTML, unsafe_allow_html=True)
+
+
+
+
+def display_simplex_iteration_history(iteration_payload):
+    """以交互方式展示单纯形表迭代步骤（父级负责折叠容器）。"""
+    if not iteration_payload or 'iterations' not in iteration_payload:
+        return
+
+    iterations = iteration_payload.get('iterations') or []
+    if not iterations:
+        return
+
+    indices = list(range(len(iterations)))
+
+    def format_label(idx: int) -> str:
+        item = iterations[idx]
+        return f"{item.get('phase')} · 第 {item.get('iteration')} 步 ({item.get('status')})"
+
+    selected_idx = st.selectbox("选择要查看的迭代步骤", indices, format_func=format_label, index=len(indices) - 1)
+    entry = iterations[selected_idx]
+
+    column_labels = entry.get('column_labels', [])
+    row_labels = entry.get('row_labels', [])
+    tableau_before = entry.get('tableau_before', [])
+    tableau_after = entry.get('tableau_after', tableau_before)
+
+    st.markdown(f"**阶段**：{entry.get('phase')}　|　**状态**：{entry.get('status')}")
+    st.markdown(f"**入基变量**：{entry.get('entering') or '-'}　|　**出基变量**：{entry.get('leaving') or '-'}")
+    st.markdown(f"**当前目标值**：{entry.get('objective_value', 0):.2f}")
+    if entry.get('reason'):
+        st.info(entry['reason'])
+
+    if tableau_before:
+        before_df = pd.DataFrame(tableau_before, columns=column_labels + ['RHS'], index=row_labels)
+        after_df = pd.DataFrame(tableau_after, columns=column_labels + ['RHS'], index=row_labels)
+        tab1, tab2 = st.tabs(["迭代前", "迭代后"])
+        with tab1:
+            st.dataframe(before_df, use_container_width=True)
+        with tab2:
+            st.dataframe(after_df, use_container_width=True)
+
+    cj_values = entry.get('cj_minus_zj')
+    if cj_values:
+        cj_df = pd.DataFrame([cj_values], columns=column_labels)
+        st.caption("Cj - Zj 行")
+        st.dataframe(cj_df, use_container_width=True)
+
+    ratios = entry.get('ratios') or []
+    if ratios:
+        ratio_df = pd.DataFrame(ratios)
+        st.caption("最小比值检验记录")
+        st.dataframe(ratio_df, use_container_width=True)
+
+
+def display_sensitivity_step_logs(sensitivity):
+    """展示灵敏度分析扫描的每一步细节。"""
+    steps = sensitivity.get('step_logs')
+    if not steps:
+        return
+
+    st.markdown("### 🧪 灵敏度分析迭代记录")
+    with st.expander("展开查看灵敏度扫描过程", expanded=False):
+        category_options = ['全部', '目标系数', '约束RHS']
+        selected_category = st.selectbox("筛选类别", category_options, index=0)
+
+        def match_category(item):
+            if selected_category == '全部':
+                return True
+            if selected_category == '目标系数':
+                return item.get('category') == 'objective'
+            return item.get('category') == 'rhs'
+
+        filtered_steps = [step for step in steps if match_category(step)]
+
+        if not filtered_steps:
+            st.info("暂无匹配的灵敏度迭代记录。")
+            return
+
+        display_rows = []
+        for step in filtered_steps:
+            display_rows.append({
+                '步骤': step.get('step'),
+                '类别': '目标系数' if step.get('category') == 'objective' else '约束RHS',
+                '对象': step.get('target'),
+                '方向': '增加' if step.get('direction') == 'increase' else '减少',
+                '测试值': step.get('tested_value'),
+                '状态': step.get('status'),
+                '可行': '是' if step.get('feasible') else '否',
+                '目标值': step.get('objective_value'),
+                '方案快照': ", ".join(f"{val:.1f}" for val in step.get('solution_snapshot', [])) if step.get('solution_snapshot') else '',
+                '备注': step.get('note') or ''
+            })
+
+        log_df = pd.DataFrame(display_rows)
+        st.dataframe(log_df, use_container_width=True)
+
 
 def main():
     """主函数"""

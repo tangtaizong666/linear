@@ -159,6 +159,46 @@
             margin-right: 0.5rem;
         }
 
+        .simplex-details {
+            background: #f5f7ff;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: inset 0 0 0 1px rgba(59,130,246,0.15);
+        }
+
+        .simplex-details summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #1d4ed8;
+            font-size: 1.1rem;
+            list-style: none;
+        }
+
+        .simplex-details summary::marker,
+        .simplex-details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .simplex-details summary span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .simplex-figure {
+            margin: 1.5rem auto;
+            max-width: 720px;
+            text-align: center;
+        }
+
+        .simplex-figure figcaption {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+
         .constraint-analysis {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -224,6 +264,172 @@
         <div class="header">
             <h1><i class="fas fa-glass-cheers"></i> 饮料生产企业线性规划优化系统</h1>
             <p>运筹学专家系统 - 解决原料和运输双重约束下的利润最大化问题</p>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-project-diagram"></i> 单纯形表迭代表可视化</h2>
+            <p style="line-height:1.8; color:#334155;">
+                为了让业务和运营同学理解优化器的工作原理，我们把两次关键的单纯形法迭代结果渲染成矢量化的单纯形表。
+                点击下方折叠面板即可查看，页面默认收起，不会影响主要 KPI 的展示。
+            </p>
+            <details class="simplex-details">
+                <summary><span>👉 展开查看单纯形表迭代过程</span></summary>
+                <div>
+                    <figure class="simplex-figure">
+                        <svg width="720" height="240" viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="web-simplex-iter0">
+                          <title id="web-simplex-iter0">单纯形法迭代 0 - 初始单纯形表</title>
+                          <style>
+                            .title { font: 600 18px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; }
+                            .subtitle { font: 500 14px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+                            .header-cell { fill:#2563eb; stroke:#1d4ed8; }
+                            .header-text { font: 600 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#ffffff; text-anchor:middle; dominant-baseline:middle; }
+                            .data-cell { fill:#ffffff; stroke:#cbd5f5; }
+                            .pivot-cell { fill:#fde68a; stroke:#f59e0b; }
+                            .cell-text { font: 500 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; text-anchor:middle; dominant-baseline:middle; }
+                            .note { font: 500 12px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+                          </style>
+                          <rect x="0" y="0" width="720" height="240" rx="18" fill="#f8fafc" stroke="#e2e8f0"/>
+                          <text x="30" y="35" class="title">迭代 0 · 初始单纯形表</text>
+                          <text x="520" y="35" class="subtitle">入基: x₁ | 出基: s₁</text>
+                          <rect x="20" y="70" width="130" height="34" class="header-cell"/>
+                          <text x="85" y="87" class="header-text">基变量</text>
+                          <rect x="150" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="195" y="87" class="header-text">x₁</text>
+                          <rect x="240" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="285" y="87" class="header-text">x₂</text>
+                          <rect x="330" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="375" y="87" class="header-text">x₃</text>
+                          <rect x="420" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="465" y="87" class="header-text">s₁</text>
+                          <rect x="510" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="555" y="87" class="header-text">s₂</text>
+                          <rect x="600" y="70" width="100" height="34" class="header-cell"/>
+                          <text x="650" y="87" class="header-text">RHS</text>
+                          <rect x="20" y="110" width="130" height="32" class="data-cell"/>
+                          <text x="85" y="126" class="cell-text">s₁</text>
+                          <rect x="150" y="110" width="90" height="32" class="pivot-cell"/>
+                          <text x="195" y="126" class="cell-text">2</text>
+                          <rect x="240" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="285" y="126" class="cell-text">1</text>
+                          <rect x="330" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="375" y="126" class="cell-text">0</text>
+                          <rect x="420" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="465" y="126" class="cell-text">1</text>
+                          <rect x="510" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="555" y="126" class="cell-text">0</text>
+                          <rect x="600" y="110" width="100" height="32" class="data-cell"/>
+                          <text x="650" y="126" class="cell-text">240</text>
+                          <rect x="20" y="146" width="130" height="32" class="data-cell"/>
+                          <text x="85" y="162" class="cell-text">s₂</text>
+                          <rect x="150" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="195" y="162" class="cell-text">1</text>
+                          <rect x="240" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="285" y="162" class="cell-text">3</text>
+                          <rect x="330" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="375" y="162" class="cell-text">1</text>
+                          <rect x="420" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="465" y="162" class="cell-text">0</text>
+                          <rect x="510" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="555" y="162" class="cell-text">1</text>
+                          <rect x="600" y="146" width="100" height="32" class="data-cell"/>
+                          <text x="650" y="162" class="cell-text">360</text>
+                          <rect x="20" y="182" width="130" height="32" class="data-cell"/>
+                          <text x="85" y="198" class="cell-text">Z</text>
+                          <rect x="150" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="195" y="198" class="cell-text">-5</text>
+                          <rect x="240" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="285" y="198" class="cell-text">-4</text>
+                          <rect x="330" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="375" y="198" class="cell-text">-3</text>
+                          <rect x="420" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="465" y="198" class="cell-text">0</text>
+                          <rect x="510" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="555" y="198" class="cell-text">0</text>
+                          <rect x="600" y="182" width="100" height="32" class="data-cell"/>
+                          <text x="650" y="198" class="cell-text">0</text>
+                          <text x="30" y="222" class="note">最小比值检验：s₁ 行 240 ÷ 2 = 120，s₂ 行 360 ÷ 1 = 360 → 选 s₁ 离基</text>
+                        </svg>
+                        <figcaption style="margin-top:0.5rem;font-size:0.9rem;color:#475569;">初始基为 s₁、s₂，x₁ 列的 reduced cost 最负，通过最小比值选择 s₁ 离基。</figcaption>
+                    </figure>
+
+                    <figure class="simplex-figure">
+                        <svg width="720" height="240" viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="web-simplex-iter1">
+                          <title id="web-simplex-iter1">单纯形法迭代 1 - 枢轴完成后</title>
+                          <style>
+                            .title { font: 600 18px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; }
+                            .subtitle { font: 500 14px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+                            .header-cell { fill:#2563eb; stroke:#1d4ed8; }
+                            .header-text { font: 600 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#ffffff; text-anchor:middle; dominant-baseline:middle; }
+                            .data-cell { fill:#ffffff; stroke:#cbd5f5; }
+                            .pivot-cell { fill:#fde68a; stroke:#f59e0b; }
+                            .cell-text { font: 500 13px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#0f172a; text-anchor:middle; dominant-baseline:middle; }
+                            .note { font: 500 12px 'Segoe UI','Microsoft YaHei',sans-serif; fill:#475569; }
+                          </style>
+                          <rect x="0" y="0" width="720" height="240" rx="18" fill="#f8fafc" stroke="#e2e8f0"/>
+                          <text x="30" y="35" class="title">迭代 1 · 枢轴完成后</text>
+                          <text x="520" y="35" class="subtitle">入基: x₂ | 出基: s₂</text>
+                          <rect x="20" y="70" width="130" height="34" class="header-cell"/>
+                          <text x="85" y="87" class="header-text">基变量</text>
+                          <rect x="150" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="195" y="87" class="header-text">x₁</text>
+                          <rect x="240" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="285" y="87" class="header-text">x₂</text>
+                          <rect x="330" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="375" y="87" class="header-text">x₃</text>
+                          <rect x="420" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="465" y="87" class="header-text">s₁</text>
+                          <rect x="510" y="70" width="90" height="34" class="header-cell"/>
+                          <text x="555" y="87" class="header-text">s₂</text>
+                          <rect x="600" y="70" width="100" height="34" class="header-cell"/>
+                          <text x="650" y="87" class="header-text">RHS</text>
+                          <rect x="20" y="110" width="130" height="32" class="data-cell"/>
+                          <text x="85" y="126" class="cell-text">x₁</text>
+                          <rect x="150" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="195" y="126" class="cell-text">1</text>
+                          <rect x="240" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="285" y="126" class="cell-text">0.5</text>
+                          <rect x="330" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="375" y="126" class="cell-text">0</text>
+                          <rect x="420" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="465" y="126" class="cell-text">0.5</text>
+                          <rect x="510" y="110" width="90" height="32" class="data-cell"/>
+                          <text x="555" y="126" class="cell-text">0</text>
+                          <rect x="600" y="110" width="100" height="32" class="data-cell"/>
+                          <text x="650" y="126" class="cell-text">120</text>
+                          <rect x="20" y="146" width="130" height="32" class="data-cell"/>
+                          <text x="85" y="162" class="cell-text">s₂</text>
+                          <rect x="150" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="195" y="162" class="cell-text">0</text>
+                          <rect x="240" y="146" width="90" height="32" class="pivot-cell"/>
+                          <text x="285" y="162" class="cell-text">2.5</text>
+                          <rect x="330" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="375" y="162" class="cell-text">1</text>
+                          <rect x="420" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="465" y="162" class="cell-text">-0.5</text>
+                          <rect x="510" y="146" width="90" height="32" class="data-cell"/>
+                          <text x="555" y="162" class="cell-text">1</text>
+                          <rect x="600" y="146" width="100" height="32" class="data-cell"/>
+                          <text x="650" y="162" class="cell-text">240</text>
+                          <rect x="20" y="182" width="130" height="32" class="data-cell"/>
+                          <text x="85" y="198" class="cell-text">Z</text>
+                          <rect x="150" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="195" y="198" class="cell-text">0</text>
+                          <rect x="240" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="285" y="198" class="cell-text">-1.5</text>
+                          <rect x="330" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="375" y="198" class="cell-text">-3</text>
+                          <rect x="420" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="465" y="198" class="cell-text">2.5</text>
+                          <rect x="510" y="182" width="90" height="32" class="data-cell"/>
+                          <text x="555" y="198" class="cell-text">0</text>
+                          <rect x="600" y="182" width="100" height="32" class="data-cell"/>
+                          <text x="650" y="198" class="cell-text">600</text>
+                          <text x="30" y="222" class="note">下一步 pivot 在 x₂ 列：s₂ 行 240 ÷ 2.5 = 96 &lt; 120 ÷ 0.5 → 选择 s₂ 离基</text>
+                        </svg>
+                        <figcaption style="margin-top:0.5rem;font-size:0.9rem;color:#475569;">完成第一个枢轴后，第二轮由 x₂ 入基，图中高亮提示下一次换基位置。</figcaption>
+                    </figure>
+                </div>
+            </details>
         </div>
 
         <div class="card">
@@ -430,8 +636,10 @@
                     通过迭代优化找到满足所有约束条件下的最大利润生产方案。
                 </p>
             </div>
+            
         </div>
 
+        
         <div class="download-section">
             <h3 style="color: white; margin-bottom: 1rem;">📥 下载资源</h3>
             <a href="beverage_optimization_model.py" class="download-btn" download>
