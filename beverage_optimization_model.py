@@ -53,7 +53,7 @@ class BeverageOptimizationModel:
         
         # 定义运输区域
         # Downstream distribution regions with dedicated transport quotas
-        self.transport_regions = ['华北区', '华东区', '华南区', '西南区', '西北区']
+        self.transport_regions = ['道里区', '南岗区', '道外区', '香坊区', '松北区']
         # Same idea for transport capacity constraints
         self.n_regions = len(self.transport_regions)
         
@@ -81,10 +81,12 @@ class BeverageOptimizationModel:
         
         # 3. 原料供应限制 (千克)
         # Available inventory per raw material for the planning cycle
+        # Regional supply estimates derived from 2025 Harbin industrial planning brief (in tons)
         self.material_limits = np.array([15000, 8000, 6000, 2000, 12000])
         
         # 4. 运输能力限制 (升)
         # Upper bounds for shipping capacity into each sales region (in kl)
+        # Freight capacities (general + cold-chain) per district, unit: thousand liters
         self.transport_limits = np.array([3000, 2500, 2000, 1800, 1200])
         
         # 5. 各饮料在各区域的需求量权重
