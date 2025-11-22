@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.optimize import linprog  # HiGHS solver entry point for large LP problems
 
 # Optional visualization stacks keep the solver usable in batch/headless environments
-# 注：模型核心功能与 Streamlit、Plotly 等可视化库解耦。
+# 注：模型核心功能与 Streamlit、Plotly 等可视化库。
 # 这些依赖在模型求解过程中并不会用到，但如果在其他模块中需要可视化时可单独引入。
 # 为避免在无可视化环境下运行测试时引发 ImportError，这里将其设为可选导入。
 try:
@@ -458,6 +458,142 @@ class BeverageOptimizationModel:
         history.extend(run_phase('Phase II', cj_phase2.copy()))
         return {'iterations': history, 'status': 'feasible'}
 
+    def _diagnose_infeasibility(self) -> Dict[str, Any]:
+        """
+        在求解器报告模型不可行时，对本业务场景做一些
+        基本的一致性检查，帮助用户判断是哪一类约束出问题。
+
+        这里只检查几类“显而易见”的矛盾：
+        - 单个产品：最小生产量 > 最大生产量
+        - 原料维度：按最小产量计算的原料需求 > 原料供应上限
+        - 运输维度：按最小产量计算的各区域运输需求 > 运输能力上限
+        """
+        diagnostics: Dict[str, Any] = {
+            'issues': [],
+            'summary': ''
+        }
+
+        tol = 1e-6
+
+        # 1) 单个产品维度：最小产量 vs 最大产量
+        for i, beverage in enumerate(self.beverage_types):
+            min_prod = float(self.min_production[i])
+            max_prod = float(self.max_production_multiplier * self.previous_sales[i])
+            if min_prod - max_prod > tol:
+                diagnostics['issues'].append({
+                    'type': 'min_max_conflict',
+                    'beverage': beverage,
+                    'min_production': min_prod,
+                    'max_allowed': max_prod,
+                    'message': (
+                        f"{beverage} 的最小生产量要求为 {min_prod:.1f}，"
+                        f"但最大允许产量只有 {max_prod:.1f}，"
+                        "同一产品的“最小生产量”和“最大生产量”约束互相矛盾。"
+                    ),
+                    'suggestion': "在侧边栏“⚙️ 生产约束参数”中，"
+                                  "降低“最小生产比例”或提高“最大生产倍数”，"
+                                  "确保最小产量 ≤ 最大产量。"
+                })
+
+        # 2) 原料维度：按最小产量计算的需求量是否超过供应上限
+        try:
+            required_materials = self.material_consumption.dot(self.min_production)
+            for j, material in enumerate(self.material_types):
+                required = float(required_materials[j])
+                limit = float(self.material_limits[j])
+                if required - limit > tol:
+                    diagnostics['issues'].append({
+                        'type': 'material_shortage_at_min',
+                        'material': material,
+                        'required': required,
+                        'limit': limit,
+                        'message': (
+                            f"在当前“最小生产比例”设置下，"
+                            f"{material} 至少需要 {required:.1f} 千克，"
+                            f"但原料供应上限只有 {limit:.1f} 千克，"
+                            "无论如何调整产品结构都无法满足原料约束。"
+                        ),
+                        'suggestion': (
+                            "可以在侧边栏“📦 原料供应限制”中提高该原料供应上限，"
+                            "或在“⚙️ 生产约束参数”中适当降低“最小生产比例”。"
+                        )
+                    })
+        except Exception:
+            # 诊断过程失败时不影响整体错误信息返回
+            pass
+
+        # 3) 运输维度：按最小产量计算的各区域运输量是否超过运输能力
+        try:
+            # self.min_production: (n_beverages,)
+            # self.demand_weights: (n_beverages, n_regions)
+            # 乘积结果为各区域最小运输需求
+            required_transport = self.min_production @ self.demand_weights
+            for j, region in enumerate(self.transport_regions):
+                required = float(required_transport[j])
+                limit = float(self.transport_limits[j])
+                if required - limit > tol:
+                    diagnostics['issues'].append({
+                        'type': 'transport_overflow_at_min',
+                        'region': region,
+                        'required': required,
+                        'limit': limit,
+                        'message': (
+                            f"在当前“最小生产比例”设置下，"
+                            f"{region} 区域至少需要运输 {required:.1f} 千升产品，"
+                            f"但运输能力上限只有 {limit:.1f} 千升。"
+                        ),
+                        'suggestion': (
+                            "可以在侧边栏“🚛 运输能力限制”中提高该区域运输上限，"
+                            "或适当降低“最小生产比例”，减轻该区域的基础运输需求。"
+                        )
+                    })
+        except Exception:
+            pass
+
+        if diagnostics['issues']:
+            diagnostics['summary'] = (
+                f"检测到 {len(diagnostics['issues'])} 处可能导致模型无解的约束设置问题，"
+                "请根据下面的具体提示调整参数后重试。"
+            )
+        else:
+            diagnostics['summary'] = (
+                "HiGHS 求解器报告“模型不可行（infeasible）”，"
+                "但在常见的参数一致性检查中未发现明显互相矛盾的约束。"
+                "建议逐步降低“最小生产比例”、放宽部分原料/运输上限，"
+                "或检查是否存在极端或错误的参数输入。"
+            )
+
+        return diagnostics
+
+    @staticmethod
+    def _format_infeasibility_message(solver_message: str,
+                                      diagnostics: Dict[str, Any]) -> str:
+        """
+        将底层求解器返回的信息和业务诊断结果整合为
+        一段对用户友好的中文错误提示文本。
+        """
+        parts: List[str] = []
+
+        base_msg = (solver_message or "").strip()
+        if base_msg:
+            parts.append(f"底层求解器信息: {base_msg}")
+
+        summary = diagnostics.get('summary')
+        if summary:
+            parts.append(summary)
+
+        issues = diagnostics.get('issues') or []
+        for issue in issues:
+            msg = issue.get('message')
+            if msg:
+                parts.append(msg)
+            suggestion = issue.get('suggestion')
+            if suggestion:
+                parts.append(f"建议：{suggestion}")
+
+        # 使用换行符，便于在 Streamlit 的 st.error 中按行显示
+        return "\n".join(parts) if parts else base_msg
+
     def solve_model(self):
         """
         使用单纯形法求解线性规划模型
@@ -484,16 +620,22 @@ class BeverageOptimizationModel:
                 solution['simplex_iterations'] = self.generate_simplex_iterations()
                 return solution
 
+            diagnostics = self._diagnose_infeasibility()
+            message = self._format_infeasibility_message(result.message or "", diagnostics)
             return {
                 'status': '求解失败',
-                'message': result.message,
-                'success': False
+                'message': message,
+                'success': False,
+                'diagnostics': diagnostics
             }
         except Exception as exc:
+            diagnostics = self._diagnose_infeasibility()
+            message = self._format_infeasibility_message(str(exc), diagnostics)
             return {
                 'status': '求解失败',
-                'message': str(exc),
-                'success': False
+                'message': message,
+                'success': False,
+                'diagnostics': diagnostics
             }
 
     def analyze_constraints(self, result, A, b):
