@@ -910,7 +910,7 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; padding: 1rem;">
-    <p>© 2024 饮料生产企业线性规划优化系统 | 运筹学专家系统</p>
+    <p>© 2025 饮料生产企业线性规划优化系统 | 运筹学专家系统</p>
     <p>基于单纯形法和灵敏度分析的企业决策支持工具</p>
     </div>
     """, unsafe_allow_html=True)
